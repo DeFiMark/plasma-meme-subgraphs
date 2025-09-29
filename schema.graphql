@@ -18,12 +18,12 @@ type UserTokenPosition @entity {
   user: Bytes!
   token: Bytes!
   balance: BigInt!              # from Transfers (and/or buys/sells)
-  avgCostEthPerToken: BigDecimal
+  avgCostEthPerToken: BigDecimal!
   totalEthBought: BigDecimal!
   totalTokensBought: BigDecimal!
   totalEthSold: BigDecimal!
   totalTokensSold: BigDecimal!
-  realizedPnLEth: BigDecimal
+  realizedPnLEth: BigDecimal!
   updatedAt: BigInt!
 }
 

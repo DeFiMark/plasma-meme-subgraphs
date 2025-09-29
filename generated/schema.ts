@@ -312,21 +312,17 @@ export class UserTokenPosition extends Entity {
     this.set("balance", Value.fromBigInt(value));
   }
 
-  get avgCostEthPerToken(): BigDecimal | null {
+  get avgCostEthPerToken(): BigDecimal {
     let value = this.get("avgCostEthPerToken");
     if (!value || value.kind == ValueKind.NULL) {
-      return null;
+      throw new Error("Cannot return null for a required field.");
     } else {
       return value.toBigDecimal();
     }
   }
 
-  set avgCostEthPerToken(value: BigDecimal | null) {
-    if (!value) {
-      this.unset("avgCostEthPerToken");
-    } else {
-      this.set("avgCostEthPerToken", Value.fromBigDecimal(<BigDecimal>value));
-    }
+  set avgCostEthPerToken(value: BigDecimal) {
+    this.set("avgCostEthPerToken", Value.fromBigDecimal(value));
   }
 
   get totalEthBought(): BigDecimal {
@@ -381,21 +377,17 @@ export class UserTokenPosition extends Entity {
     this.set("totalTokensSold", Value.fromBigDecimal(value));
   }
 
-  get realizedPnLEth(): BigDecimal | null {
+  get realizedPnLEth(): BigDecimal {
     let value = this.get("realizedPnLEth");
     if (!value || value.kind == ValueKind.NULL) {
-      return null;
+      throw new Error("Cannot return null for a required field.");
     } else {
       return value.toBigDecimal();
     }
   }
 
-  set realizedPnLEth(value: BigDecimal | null) {
-    if (!value) {
-      this.unset("realizedPnLEth");
-    } else {
-      this.set("realizedPnLEth", Value.fromBigDecimal(<BigDecimal>value));
-    }
+  set realizedPnLEth(value: BigDecimal) {
+    this.set("realizedPnLEth", Value.fromBigDecimal(value));
   }
 
   get updatedAt(): BigInt {
