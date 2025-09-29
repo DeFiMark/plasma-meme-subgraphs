@@ -1,0 +1,116 @@
+specVersion: 0.0.5
+schema:
+  file: ./schema.graphql
+
+# ---- ROOT DATA SOURCES ----
+dataSources:
+  - kind: ethereum
+    name: Database
+    network: plasma-mainnet                       # e.g. mainnet, base, bsc, etc.
+    source:
+      address: "0x5ad45DCFC2049362eB62321265248e6D6053b5D9"
+      abi: Database
+      startBlock: 2122377
+    mapping:
+      kind: wasm/assemblyscript
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Token
+        - UserTokenPosition
+        - Trade
+        - TokenDayData
+      abis:
+        - name: Database
+          file: ./abis/Database.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: BondingCurve
+          file: ./abis/BondingCurve.json
+      eventHandlers:
+        # event NewTokenCreated(address indexed dev, address token, address bondingCurve, uint nonce, bytes projectData)
+        - event: NewTokenCreated(indexed address,address,address,uint256,bytes)
+          handler: handleNewTokenCreated
+        # event Bonded(address token)
+        - event: Bonded(address)
+          handler: handleBonded
+      file: ./src/database.ts
+
+  - kind: ethereum
+    name: DexFactory
+    network: plasma-mainnet
+    source:
+      address: "0xAa55cA0C522d575A7537587D805960b25fb95A32"
+      abi: Factory
+      startBlock: 2122561
+    mapping:
+      kind: wasm/assemblyscript
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Token
+        - Trade
+        - UserTokenPosition
+        - TokenDayData
+      abis:
+        - name: Factory
+          file: ./abis/Factory.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+      eventHandlers:
+        # event PairCreated(address indexed token0, address indexed token1, address pair, uint)
+        - event: PairCreated(indexed address,indexed address,address,uint256)
+          handler: handlePairCreated
+        # event Buy(address indexed token, address indexed user, uint256 quantityETH, uint256 quantityTokens);
+        - event: Buy(indexed address,indexed address,uint256,uint256)
+          handler: handleDexBuy
+        # event Sell(address indexed token, address indexed user, uint256 quantityETH, uint256 quantityTokens);
+        - event: Sell(indexed address,indexed address,uint256,uint256)
+          handler: handleDexSell
+      file: ./src/factory.ts
+
+# ---- DYNAMIC TEMPLATES ----
+templates:
+  - name: ERC20
+    kind: ethereum/contract
+    network: plasma-mainnet
+    source:
+      abi: ERC20
+    mapping:
+      kind: wasm/assemblyscript
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - UserTokenPosition
+        - Token
+      abis:
+        - name: ERC20
+          file: ./abis/ERC20.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+      file: ./src/erc20.ts
+
+  - name: BondingCurve
+    kind: ethereum/contract
+    network: plasma-mainnet
+    source:
+      abi: BondingCurve
+    mapping:
+      kind: wasm/assemblyscript
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Trade
+        - UserTokenPosition
+        - Token
+        - TokenDayData
+      abis:
+        - name: BondingCurve
+          file: ./abis/BondingCurve.json
+      eventHandlers:
+        - event: Buy(indexed address,indexed address,uint256,uint256)
+          handler: handleCurveBuy
+        - event: Sell(indexed address,indexed address,uint256,uint256)
+          handler: handleCurveSell
+      file: ./src/bondingCurve.ts

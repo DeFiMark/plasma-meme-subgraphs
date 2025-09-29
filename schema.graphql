@@ -1,0 +1,51 @@
+type Token @entity {
+  id: ID!                       # token address (lowercase)
+  creator: Bytes!               # dev from NewTokenCreated
+  bondingCurve: Bytes           # curve address before bond
+  createdAt: BigInt!
+  bondedAt: BigInt
+  pair: Bytes                   # DEX pair after bonding (optional)
+  totalSupply: BigInt
+  latestPriceEth: BigDecimal
+  volume24hEth: BigDecimal
+  volume24hToken: BigDecimal
+  price24hAgoEth: BigDecimal
+  updatedAt: BigInt
+}
+
+type UserTokenPosition @entity {
+  id: ID!                       # `${user}-${token}`
+  user: Bytes!
+  token: Bytes!
+  balance: BigInt!              # from Transfers (and/or buys/sells)
+  avgCostEthPerToken: BigDecimal
+  totalEthBought: BigDecimal!
+  totalTokensBought: BigDecimal!
+  totalEthSold: BigDecimal!
+  totalTokensSold: BigDecimal!
+  realizedPnLEth: BigDecimal
+  updatedAt: BigInt!
+}
+
+type Trade @entity {
+  id: ID!
+  txHash: Bytes!
+  logIndex: BigInt!
+  timestamp: BigInt!
+  user: Bytes!
+  token: Bytes!
+  side: String!                 # "BUY" | "SELL"
+  quantityETH: BigDecimal!
+  quantityTokens: BigDecimal!
+  source: String!               # "CURVE" | "DEX"
+}
+
+# Optional: 1 entity per token per UTC day (for 24h stats & charts)
+type TokenDayData @entity {
+  id: ID!                       # `${token}-${dayId}`
+  token: Bytes!
+  date: Int!
+  volumeEth: BigDecimal!
+  volumeToken: BigDecimal!
+  closePriceEth: BigDecimal
+}
