@@ -6,16 +6,6 @@ import {
   DataSourceContext,
 } from "@graphprotocol/graph-ts";
 
-export class ERC20 extends DataSourceTemplate {
-  static create(address: Address): void {
-    DataSourceTemplate.create("ERC20", [address.toHex()]);
-  }
-
-  static createWithContext(address: Address, context: DataSourceContext): void {
-    DataSourceTemplate.createWithContext("ERC20", [address.toHex()], context);
-  }
-}
-
 export class BondingCurve extends DataSourceTemplate {
   static create(address: Address): void {
     DataSourceTemplate.create("BondingCurve", [address.toHex()]);
@@ -27,5 +17,15 @@ export class BondingCurve extends DataSourceTemplate {
       [address.toHex()],
       context,
     );
+  }
+}
+
+export class Token extends DataSourceTemplate {
+  static create(address: Address): void {
+    DataSourceTemplate.create("Token", [address.toHex()]);
+  }
+
+  static createWithContext(address: Address, context: DataSourceContext): void {
+    DataSourceTemplate.createWithContext("Token", [address.toHex()], context);
   }
 }

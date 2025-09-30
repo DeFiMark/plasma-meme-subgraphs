@@ -1,8 +1,7 @@
 specVersion: 0.0.5
 schema:
-  file: ./schema.graphql
+  file: schema.graphql
 dataSources:
-  # This is your main database contract
   - kind: ethereum
     name: Database
     network: plasma
@@ -18,15 +17,13 @@ dataSources:
         - Token
       abis:
         - name: Database
-          file: ./abis/Database.json
+          file: Database\abis\Database.json
       eventHandlers:
         - event: NewTokenCreated(indexed address,address,address,string,string)
           handler: handleNewTokenCreated
         - event: Bonded(address)
           handler: handleBonded
-      file: ./src/mappings.ts
-
-  # This is your DEX Factory contract
+      file: Database\Database.wasm
   - kind: ethereum
     name: Factory
     network: plasma
@@ -44,17 +41,14 @@ dataSources:
         - UserToken
       abis:
         - name: Factory
-          file: ./abis/Factory.json
+          file: Factory\abis\Factory.json
       eventHandlers:
         - event: Buy(indexed address,indexed address,uint256,uint256)
           handler: handleFactoryBuy
         - event: Sell(indexed address,indexed address,uint256,uint256)
           handler: handleFactorySell
-      file: ./src/mappings.ts
-
-# These are templates that can be dynamically created from the mapping
+      file: Database\Database.wasm
 templates:
-  # Template for the Bonding Curve contracts
   - kind: ethereum
     name: BondingCurve
     network: plasma
@@ -70,15 +64,13 @@ templates:
         - UserToken
       abis:
         - name: BondingCurve
-          file: ./abis/BondingCurve.json
+          file: BondingCurve\abis\BondingCurve.json
       eventHandlers:
         - event: Buy(indexed address,indexed address,uint256,uint256)
           handler: handleBondingCurveBuy
         - event: Sell(indexed address,indexed address,uint256,uint256)
           handler: handleBondingCurveSell
-      file: ./src/mappings.ts
-
-  # (Lower Priority) Template for the Token contracts themselves
+      file: Database\Database.wasm
   - kind: ethereum
     name: Token
     network: plasma
@@ -94,8 +86,8 @@ templates:
         - TokenHolder
       abis:
         - name: ERC20
-          file: ./abis/ERC20.json
+          file: Token\abis\ERC20.json
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
-      file: ./src/mappings.ts
+      file: Database\Database.wasm

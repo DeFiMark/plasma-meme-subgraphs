@@ -53,12 +53,12 @@ export class NewTokenCreated__Params {
     return this._event.parameters[2].value.toAddress();
   }
 
-  get nonce(): BigInt {
-    return this._event.parameters[3].value.toBigInt();
+  get name(): string {
+    return this._event.parameters[3].value.toString();
   }
 
-  get projectData(): Bytes {
-    return this._event.parameters[4].value.toBytes();
+  get symbol(): string {
+    return this._event.parameters[4].value.toString();
   }
 }
 
@@ -81,6 +81,82 @@ export class OwnerSet__Params {
 
   get newOwner(): Address {
     return this._event.parameters[1].value.toAddress();
+  }
+}
+
+export class Database__batchGetProjectAvancedInfoResult {
+  value0: Array<Address>;
+  value1: Array<Address>;
+  value2: Array<Array<string>>;
+  value3: Array<Address>;
+  value4: Array<string>;
+  value5: Array<string>;
+  value6: Array<BigInt>;
+  value7: Array<boolean>;
+
+  constructor(
+    value0: Array<Address>,
+    value1: Array<Address>,
+    value2: Array<Array<string>>,
+    value3: Array<Address>,
+    value4: Array<string>,
+    value5: Array<string>,
+    value6: Array<BigInt>,
+    value7: Array<boolean>,
+  ) {
+    this.value0 = value0;
+    this.value1 = value1;
+    this.value2 = value2;
+    this.value3 = value3;
+    this.value4 = value4;
+    this.value5 = value5;
+    this.value6 = value6;
+    this.value7 = value7;
+  }
+
+  toMap(): TypedMap<string, ethereum.Value> {
+    let map = new TypedMap<string, ethereum.Value>();
+    map.set("value0", ethereum.Value.fromAddressArray(this.value0));
+    map.set("value1", ethereum.Value.fromAddressArray(this.value1));
+    map.set("value2", ethereum.Value.fromStringMatrix(this.value2));
+    map.set("value3", ethereum.Value.fromAddressArray(this.value3));
+    map.set("value4", ethereum.Value.fromStringArray(this.value4));
+    map.set("value5", ethereum.Value.fromStringArray(this.value5));
+    map.set("value6", ethereum.Value.fromUnsignedBigIntArray(this.value6));
+    map.set("value7", ethereum.Value.fromBooleanArray(this.value7));
+    return map;
+  }
+
+  getAssets(): Array<Address> {
+    return this.value0;
+  }
+
+  getBondingCurves(): Array<Address> {
+    return this.value1;
+  }
+
+  getMetadata(): Array<Array<string>> {
+    return this.value2;
+  }
+
+  getDevs(): Array<Address> {
+    return this.value3;
+  }
+
+  getNames(): Array<string> {
+    return this.value4;
+  }
+
+  getSymbols(): Array<string> {
+    return this.value5;
+  }
+
+  getLaunchTimes(): Array<BigInt> {
+    return this.value6;
+  }
+
+  getIsBonded_(): Array<boolean> {
+    return this.value7;
   }
 }
 
@@ -288,19 +364,39 @@ export class Database__paginatePrebondedProjectsResult {
 export class Database__projectsResult {
   value0: Address;
   value1: Address;
-  value2: Address;
+  value2: string;
+  value3: string;
+  value4: Address;
+  value5: Address;
+  value6: BigInt;
 
-  constructor(value0: Address, value1: Address, value2: Address) {
+  constructor(
+    value0: Address,
+    value1: Address,
+    value2: string,
+    value3: string,
+    value4: Address,
+    value5: Address,
+    value6: BigInt,
+  ) {
     this.value0 = value0;
     this.value1 = value1;
     this.value2 = value2;
+    this.value3 = value3;
+    this.value4 = value4;
+    this.value5 = value5;
+    this.value6 = value6;
   }
 
   toMap(): TypedMap<string, ethereum.Value> {
     let map = new TypedMap<string, ethereum.Value>();
     map.set("value0", ethereum.Value.fromAddress(this.value0));
     map.set("value1", ethereum.Value.fromAddress(this.value1));
-    map.set("value2", ethereum.Value.fromAddress(this.value2));
+    map.set("value2", ethereum.Value.fromString(this.value2));
+    map.set("value3", ethereum.Value.fromString(this.value3));
+    map.set("value4", ethereum.Value.fromAddress(this.value4));
+    map.set("value5", ethereum.Value.fromAddress(this.value5));
+    map.set("value6", ethereum.Value.fromUnsignedBigInt(this.value6));
     return map;
   }
 
@@ -312,8 +408,24 @@ export class Database__projectsResult {
     return this.value1;
   }
 
-  getDev(): Address {
+  getName(): string {
     return this.value2;
+  }
+
+  getSymbol(): string {
+    return this.value3;
+  }
+
+  getDev(): Address {
+    return this.value4;
+  }
+
+  getCreatorAddress(): Address {
+    return this.value5;
+  }
+
+  getLaunchTime(): BigInt {
+    return this.value6;
   }
 }
 
@@ -398,6 +510,53 @@ export class Database extends ethereum.SmartContract {
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(value[0].toBigInt());
+  }
+
+  batchGetProjectAvancedInfo(
+    projectIDs: Array<BigInt>,
+  ): Database__batchGetProjectAvancedInfoResult {
+    let result = super.call(
+      "batchGetProjectAvancedInfo",
+      "batchGetProjectAvancedInfo(uint256[]):(address[],address[],string[][],address[],string[],string[],uint256[],bool[])",
+      [ethereum.Value.fromUnsignedBigIntArray(projectIDs)],
+    );
+
+    return new Database__batchGetProjectAvancedInfoResult(
+      result[0].toAddressArray(),
+      result[1].toAddressArray(),
+      result[2].toStringMatrix(),
+      result[3].toAddressArray(),
+      result[4].toStringArray(),
+      result[5].toStringArray(),
+      result[6].toBigIntArray(),
+      result[7].toBooleanArray(),
+    );
+  }
+
+  try_batchGetProjectAvancedInfo(
+    projectIDs: Array<BigInt>,
+  ): ethereum.CallResult<Database__batchGetProjectAvancedInfoResult> {
+    let result = super.tryCall(
+      "batchGetProjectAvancedInfo",
+      "batchGetProjectAvancedInfo(uint256[]):(address[],address[],string[][],address[],string[],string[],uint256[],bool[])",
+      [ethereum.Value.fromUnsignedBigIntArray(projectIDs)],
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(
+      new Database__batchGetProjectAvancedInfoResult(
+        value[0].toAddressArray(),
+        value[1].toAddressArray(),
+        value[2].toStringMatrix(),
+        value[3].toAddressArray(),
+        value[4].toStringArray(),
+        value[5].toStringArray(),
+        value[6].toBigIntArray(),
+        value[7].toBooleanArray(),
+      ),
+    );
   }
 
   batchGetProjectInfo(
@@ -711,6 +870,29 @@ export class Database extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toBigInt());
   }
 
+  getLaunchTime(token: Address): BigInt {
+    let result = super.call(
+      "getLaunchTime",
+      "getLaunchTime(address):(uint256)",
+      [ethereum.Value.fromAddress(token)],
+    );
+
+    return result[0].toBigInt();
+  }
+
+  try_getLaunchTime(token: Address): ethereum.CallResult<BigInt> {
+    let result = super.tryCall(
+      "getLaunchTime",
+      "getLaunchTime(address):(uint256)",
+      [ethereum.Value.fromAddress(token)],
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
+  }
+
   getLiquidityLocker(): Address {
     let result = super.call(
       "getLiquidityLocker",
@@ -772,6 +954,31 @@ export class Database extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toAddress());
   }
 
+  getProjectCreatorRewardsAddress(token: Address): Address {
+    let result = super.call(
+      "getProjectCreatorRewardsAddress",
+      "getProjectCreatorRewardsAddress(address):(address)",
+      [ethereum.Value.fromAddress(token)],
+    );
+
+    return result[0].toAddress();
+  }
+
+  try_getProjectCreatorRewardsAddress(
+    token: Address,
+  ): ethereum.CallResult<Address> {
+    let result = super.tryCall(
+      "getProjectCreatorRewardsAddress",
+      "getProjectCreatorRewardsAddress(address):(address)",
+      [ethereum.Value.fromAddress(token)],
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toAddress());
+  }
+
   getProjectDev(token: Address): Address {
     let result = super.call(
       "getProjectDev",
@@ -793,6 +1000,31 @@ export class Database extends ethereum.SmartContract {
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(value[0].toAddress());
+  }
+
+  getProjectIDsByTokens(tokens: Array<Address>): Array<BigInt> {
+    let result = super.call(
+      "getProjectIDsByTokens",
+      "getProjectIDsByTokens(address[]):(uint256[])",
+      [ethereum.Value.fromAddressArray(tokens)],
+    );
+
+    return result[0].toBigIntArray();
+  }
+
+  try_getProjectIDsByTokens(
+    tokens: Array<Address>,
+  ): ethereum.CallResult<Array<BigInt>> {
+    let result = super.tryCall(
+      "getProjectIDsByTokens",
+      "getProjectIDsByTokens(address[]):(uint256[])",
+      [ethereum.Value.fromAddressArray(tokens)],
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigIntArray());
   }
 
   getProjectInfoByToken(token: Address): Database__getProjectInfoByTokenResult {
@@ -1207,21 +1439,25 @@ export class Database extends ethereum.SmartContract {
   projects(param0: BigInt): Database__projectsResult {
     let result = super.call(
       "projects",
-      "projects(uint256):(address,address,address)",
+      "projects(uint256):(address,address,string,string,address,address,uint256)",
       [ethereum.Value.fromUnsignedBigInt(param0)],
     );
 
     return new Database__projectsResult(
       result[0].toAddress(),
       result[1].toAddress(),
-      result[2].toAddress(),
+      result[2].toString(),
+      result[3].toString(),
+      result[4].toAddress(),
+      result[5].toAddress(),
+      result[6].toBigInt(),
     );
   }
 
   try_projects(param0: BigInt): ethereum.CallResult<Database__projectsResult> {
     let result = super.tryCall(
       "projects",
-      "projects(uint256):(address,address,address)",
+      "projects(uint256):(address,address,string,string,address,address,uint256)",
       [ethereum.Value.fromUnsignedBigInt(param0)],
     );
     if (result.reverted) {
@@ -1232,24 +1468,13 @@ export class Database extends ethereum.SmartContract {
       new Database__projectsResult(
         value[0].toAddress(),
         value[1].toAddress(),
-        value[2].toAddress(),
+        value[2].toString(),
+        value[3].toString(),
+        value[4].toAddress(),
+        value[5].toAddress(),
+        value[6].toBigInt(),
       ),
     );
-  }
-
-  router(): Address {
-    let result = super.call("router", "router():(address)", []);
-
-    return result[0].toAddress();
-  }
-
-  try_router(): ethereum.CallResult<Address> {
-    let result = super.tryCall("router", "router():(address)", []);
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toAddress());
   }
 }
 
@@ -1422,6 +1647,14 @@ export class LaunchProjectCall__Inputs {
 
   get bondingCurvePayload(): Bytes {
     return this._call.inputValues[2].value.toBytes();
+  }
+
+  get name(): string {
+    return this._call.inputValues[3].value.toString();
+  }
+
+  get symbol(): string {
+    return this._call.inputValues[4].value.toString();
   }
 }
 
@@ -1745,32 +1978,36 @@ export class SetPausedCall__Outputs {
   }
 }
 
-export class SetRouterCall extends ethereum.Call {
-  get inputs(): SetRouterCall__Inputs {
-    return new SetRouterCall__Inputs(this);
+export class SetProjectCreatorRewardsAddressCall extends ethereum.Call {
+  get inputs(): SetProjectCreatorRewardsAddressCall__Inputs {
+    return new SetProjectCreatorRewardsAddressCall__Inputs(this);
   }
 
-  get outputs(): SetRouterCall__Outputs {
-    return new SetRouterCall__Outputs(this);
+  get outputs(): SetProjectCreatorRewardsAddressCall__Outputs {
+    return new SetProjectCreatorRewardsAddressCall__Outputs(this);
   }
 }
 
-export class SetRouterCall__Inputs {
-  _call: SetRouterCall;
+export class SetProjectCreatorRewardsAddressCall__Inputs {
+  _call: SetProjectCreatorRewardsAddressCall;
 
-  constructor(call: SetRouterCall) {
+  constructor(call: SetProjectCreatorRewardsAddressCall) {
     this._call = call;
   }
 
-  get _router(): Address {
+  get token(): Address {
     return this._call.inputValues[0].value.toAddress();
+  }
+
+  get _projectCreatorRewardsAddress(): Address {
+    return this._call.inputValues[1].value.toAddress();
   }
 }
 
-export class SetRouterCall__Outputs {
-  _call: SetRouterCall;
+export class SetProjectCreatorRewardsAddressCall__Outputs {
+  _call: SetProjectCreatorRewardsAddressCall;
 
-  constructor(call: SetRouterCall) {
+  constructor(call: SetProjectCreatorRewardsAddressCall) {
     this._call = call;
   }
 }
