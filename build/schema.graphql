@@ -26,6 +26,14 @@ type Token @entity {
   symbol: String!
   "Set to true when the Bonded event is emitted"
   bonded: Boolean!
+  "The price in ETH, updated on every trade"
+  priceETH: BigDecimal!
+  "The total trading volume in ETH (buys + sells)"
+  volumeETH: BigDecimal!
+  "Timestamp of the last Buy event (for bump order)"
+  lastTradeTimestamp: BigInt!
+  "Timestamp of the token's creation"
+  createdAtTimestamp: BigInt!
   "Link to all user-specific data for this token"
   userTokenData: [UserToken!] @derivedFrom(field: "token")
   "Link to all holders of this token"

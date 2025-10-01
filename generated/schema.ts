@@ -115,6 +115,58 @@ export class Token extends Entity {
     this.set("bonded", Value.fromBoolean(value));
   }
 
+  get priceETH(): BigDecimal {
+    let value = this.get("priceETH");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBigDecimal();
+    }
+  }
+
+  set priceETH(value: BigDecimal) {
+    this.set("priceETH", Value.fromBigDecimal(value));
+  }
+
+  get volumeETH(): BigDecimal {
+    let value = this.get("volumeETH");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBigDecimal();
+    }
+  }
+
+  set volumeETH(value: BigDecimal) {
+    this.set("volumeETH", Value.fromBigDecimal(value));
+  }
+
+  get lastTradeTimestamp(): BigInt {
+    let value = this.get("lastTradeTimestamp");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set lastTradeTimestamp(value: BigInt) {
+    this.set("lastTradeTimestamp", Value.fromBigInt(value));
+  }
+
+  get createdAtTimestamp(): BigInt {
+    let value = this.get("createdAtTimestamp");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set createdAtTimestamp(value: BigInt) {
+    this.set("createdAtTimestamp", Value.fromBigInt(value));
+  }
+
   get userTokenData(): UserTokenLoader {
     return new UserTokenLoader(
       "Token",

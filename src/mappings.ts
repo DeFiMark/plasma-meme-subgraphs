@@ -32,6 +32,10 @@ export function handleNewTokenCreated(event: NewTokenCreated): void {
   token.name = event.params.name;
   token.symbol = event.params.symbol;
   token.bonded = false; // Initialize as not bonded
+  token.priceETH = BigDecimal.zero();
+  token.volumeETH = BigDecimal.zero();
+  token.lastTradeTimestamp = BigInt.zero();
+  token.createdAtTimestamp = event.block.timestamp;
   token.save();
 
   // Start dynamically tracking the new BondingCurve contract
@@ -51,11 +55,51 @@ export function handleBonded(event: Bonded): void {
   }
 }
 
+function updateTokenMetrics(
+    tokenAddress: Address, 
+    ethAmount: BigInt, 
+    tokenAmount: BigInt,
+    timestamp: BigInt,
+    isBuy: boolean
+  ): void {
+    let token = Token.load(tokenAddress.toHexString());
+    if (!token) {
+      log.warning("Attempted to update metrics for a token that does not exist: {}", [tokenAddress.toHexString()]);
+      return;
+    }
+  
+    // 1. Update Volume (sum of all trades)
+    token.volumeETH = token.volumeETH.plus(toBigDecimal(ethAmount));
+  
+    // 2. Update Price
+    // Avoid division by zero, though unlikely in a real trade
+    if (!tokenAmount.isZero()) {
+      token.priceETH = toBigDecimal(ethAmount).div(toBigDecimal(tokenAmount));
+    }
+  
+    // 3. Update Bump Order (only on buys)
+    if (isBuy) {
+      token.lastTradeTimestamp = timestamp;
+    }
+    
+    token.save();
+  }
+
 // =============================================
 // Shared Trade Logic
 // =============================================
 
-function processBuy(tokenAddress: Address, userAddress: Address, ethAmount: BigInt, tokenAmount: BigInt): void {
+function processBuy(
+    tokenAddress: Address, 
+    userAddress: Address, 
+    ethAmount: BigInt, 
+    tokenAmount: BigInt,
+    timestamp: BigInt // Accept timestamp directly
+  ): void {
+
+  // update token metrics
+  updateTokenMetrics(tokenAddress, ethAmount, tokenAmount, timestamp, true);
+
   // Ensure the User entity exists
   let user = User.load(userAddress.toHexString());
   if (!user) {
@@ -85,7 +129,17 @@ function processBuy(tokenAddress: Address, userAddress: Address, ethAmount: BigI
 }
 
 
-function processSell(tokenAddress: Address, userAddress: Address, ethAmount: BigInt, tokenAmount: BigInt): void {
+function processSell(
+    tokenAddress: Address, 
+    userAddress: Address, 
+    ethAmount: BigInt, 
+    tokenAmount: BigInt,
+    timestamp: BigInt // Accept timestamp directly
+  ): void {
+    
+  // update token metrics
+  updateTokenMetrics(tokenAddress, ethAmount, tokenAmount, timestamp, false);
+
   // Ensure the User entity exists
   let user = User.load(userAddress.toHexString());
   if (!user) {
@@ -119,24 +173,24 @@ function processSell(tokenAddress: Address, userAddress: Address, ethAmount: Big
 // =============================================
 
 export function handleBondingCurveBuy(event: BondingCurveBuyEvent): void {
-  processBuy(event.params.token, event.params.user, event.params.quantityETH, event.params.quantityTokens);
-}
-
-export function handleBondingCurveSell(event: BondingCurveSellEvent): void {
-  processSell(event.params.token, event.params.user, event.params.quantityETH, event.params.quantityTokens);
-}
-
-// =============================================
-// Factory Contract Handlers
-// =============================================
-
-export function handleFactoryBuy(event: FactoryBuyEvent): void {
-  processBuy(event.params.token, event.params.user, event.params.quantityETH, event.params.quantityTokens);
-}
-
-export function handleFactorySell(event: FactorySellEvent): void {
-  processSell(event.params.token, event.params.user, event.params.quantityETH, event.params.quantityTokens);
-}
+    // Pass event.block.timestamp directly
+    processBuy(event.params.token, event.params.user, event.params.quantityETH, event.params.quantityTokens, event.block.timestamp);
+  }
+  
+  export function handleBondingCurveSell(event: BondingCurveSellEvent): void {
+    // Pass event.block.timestamp directly
+    processSell(event.params.token, event.params.user, event.params.quantityETH, event.params.quantityTokens, event.block.timestamp);
+  }
+  
+  export function handleFactoryBuy(event: FactoryBuyEvent): void {
+    // Pass event.block.timestamp directly
+    processBuy(event.params.token, event.params.user, event.params.quantityETH, event.params.quantityTokens, event.block.timestamp);
+  }
+  
+  export function handleFactorySell(event: FactorySellEvent): void {
+    // Pass event.block.timestamp directly
+    processSell(event.params.token, event.params.user, event.params.quantityETH, event.params.quantityTokens, event.block.timestamp);
+  }
 
 // =============================================
 // (Lower Priority) Token Transfer Handler
