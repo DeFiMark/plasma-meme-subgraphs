@@ -1,12 +1,12 @@
 {
   "name": "plasma-meme-subgraph",
-  "version": "1.0.1",
+  "version": "1.0.3",
   "license": "MIT",
   "scripts": {
     "codegen": "graph codegen",
     "build": "graph build",
-    "create:goldsky": "goldsky subgraph create plasma-meme/1.0.1",
-    "deploy:goldsky": "goldsky subgraph deploy plasma-meme/1.0.1 --path ."
+    "create:goldsky": "goldsky subgraph create plasma-meme/1.0.3",
+    "deploy:goldsky": "goldsky subgraph deploy plasma-meme/1.0.3 --path ."
   },
   "devDependencies": {
     "@graphprotocol/graph-cli": "^0.77.0",

@@ -8,9 +8,9 @@ dataSources:
     name: Database
     network: plasma-mainnet
     source:
-      address: "0x04E137dfdA310805B2905F6dE6A12Aa185Eee457"
+      address: "0x6301d3534Fa0be6FA20E17869d52295A71b2f8C5"
       abi: Database
-      startBlock: 2328807
+      startBlock: 2359805
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -30,9 +30,9 @@ dataSources:
     name: Factory
     network: plasma-mainnet
     source:
-      address: "0xa8Ca214F779a71143881c41066d92019858efa35"
+      address: "0x0b4Ff3Cb5123A7Ddff1862fffe247066cE8B0a41"
       abi: Factory
-      startBlock: 2328833
+      startBlock: 2359831
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
